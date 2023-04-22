@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'add_task.dart';
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -37,7 +37,8 @@ class _HomeState extends State<Home> {
                     ),
                   ),
                 ),
-                onPressed: _addTask,
+                onPressed: () =>
+                 Navigator.push(context, MaterialPageRoute(builder: (context) => TaskForm())),
                 child: const Icon(Icons.add)),
             ),
       
