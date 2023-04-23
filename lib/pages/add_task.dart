@@ -1,55 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:todoapp_cubit/states/tag_state.dart';
+import 'add_tag.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:todoapp_cubit/blocs/tasks_cubit.dart';
+import 'package:todoapp_cubit/blocs/tags_cubit.dart';
+import 'package:todoapp_cubit/dto/task.dart';
+import 'package:todoapp_cubit/dto/tag.dart';
 
-class TaskForm extends StatefulWidget {
-  @override
-  _TaskFormState createState() => _TaskFormState();
-}
-
-class _TaskFormState extends State<TaskForm> {
-  final _formKey = GlobalKey<FormState>();
-  final _tagsController = TextEditingController();
-
-  String _taskName = '';
-  DateTime _dueDate = DateTime.now();
-  List<String> _tags = [];
-
-  @override
-  void dispose() {
-    _tagsController.dispose();
-    super.dispose();
-  }
-
-  void _addTag() {
-    setState(() {
-      _tags.add(_tagsController.text);
-      _tagsController.clear();
-    });
-  }
-
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      // Form is valid, do something with the data
-      print('Task name: $_taskName');
-      print('Due date: $_dueDate');
-      print('Tags: $_tags');
-    }
-  }
+class TaskForm extends StatelessWidget {
+  const TaskForm({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final formKey = GlobalKey<FormState>();
+    final tagsController = TextEditingController();
+
+    String taskName = '';
+    DateTime dueDate = DateTime.now();
+
+    void submitForm() {
+      if (formKey.currentState!.validate()) {
+        // Form is valid, do something with the data
+        formKey.currentState!.save();
+        int selectTag = BlocProvider.of<TagsCubit>(context).state.selectedTag;
+        final task = Task(
+          title: taskName,
+          description: "Descripcion",
+          isCompleted: false,
+          dueDate: dueDate,
+          tag: BlocProvider.of<TagsCubit>(context).state.tags[selectTag],
+        );
+        BlocProvider.of<TasksCubit>(context).addTask(task);
+        Navigator.pop(context);
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('New Task'),
+        title: const Text('New Task'),
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
-          key: _formKey,
+          key: formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               TextFormField(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Task Name',
                 ),
                 validator: (value) {
@@ -59,66 +57,67 @@ class _TaskFormState extends State<TaskForm> {
                   return null;
                 },
                 onSaved: (value) {
-                  _taskName = value!;
+                  taskName = value!;
                 },
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               Row(
                 children: <Widget>[
-                  Text('Due Date: '),
+                  const Text('Due Date: '),
                   TextButton(
                     onPressed: () async {
                       final date = await showDatePicker(
                         context: context,
-                        initialDate: _dueDate,
+                        initialDate: dueDate,
                         firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(Duration(days: 365)),
+                        lastDate: DateTime.now().add(const Duration(days: 365)),
                       );
                       if (date != null) {
-                        setState(() {
-                          _dueDate = date;
-                        });
+                        dueDate = date;
                       }
                     },
                     child: Text(
-                      '${_dueDate.day}/${_dueDate.month}/${_dueDate.year}',
+                      '${dueDate.day}/${dueDate.month}/${dueDate.year}',
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               Row(
                 children: <Widget>[
                   Expanded(
-                    child: TextFormField(
-                      controller: _tagsController,
-                      decoration: InputDecoration(
-                        labelText: 'Tags',
-                      ),
+                    child: BlocBuilder<TagsCubit, TagState>(
+                      builder: (context, state) {
+                        return DropdownButtonFormField(
+                          value: state.tags.isEmpty ? null : state.tags[state.selectedTag],
+                          hint: const Text('Select a tag'),
+                          items: state.tags.map((tag) {
+                            return DropdownMenuItem(
+                              value: tag,
+                              child: Text(tag.text),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            BlocProvider.of<TagsCubit>(context).selectTag(state.tags.indexOf(value as Tag));
+                          },
+                        );
+                      },
                     ),
                   ),
-                  SizedBox(width: 16.0),
-                  ElevatedButton(
-                    onPressed: _addTag,
-                    child: Text('Add Tag'),
+                  const SizedBox(width: 16.0),
+                  IconButton(
+                    onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AddTag())),
+                    icon: const Icon(Icons.edit),
                   ),
                 ],
               ),
-              SizedBox(height: 16.0),
-              DropdownButtonFormField(
-                value: null,
-                hint: Text('Select a tag'),
-                items: _tags.map((tag) {
-                  return DropdownMenuItem(
-                    value: tag,
-                    child: Text(tag),
-                  );
-                }).toList(),
-                onChanged: (value) {},
-              ),
-              SizedBox(height: 32.0),
+              //Show all selected tags
+              const SizedBox(height: 32.0),
               Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   TextButton(
                     onPressed: () {
@@ -126,9 +125,9 @@ class _TaskFormState extends State<TaskForm> {
                     },
                     child: Text('Cancel'),
                   ),
-                  SizedBox(width: 16.0),
+                  const SizedBox(width: 16.0),
                   ElevatedButton(
-                    onPressed: _submitForm,
+                    onPressed: submitForm,
                     child: Text('Add Task'),
                   ),
                 ],
