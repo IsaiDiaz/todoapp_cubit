@@ -9,11 +9,14 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color completedColor = Colors.green;
+    Color pendingColor = Colors.red;
+
     return BlocBuilder<TasksCubit, TaskState>(
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
-            title: Text('Task List'),
+            title: const Text('Lista de tareas'),
           ),
           body: Padding(
             padding: const EdgeInsets.all(15.0),
@@ -33,35 +36,21 @@ class Home extends StatelessWidget {
                       ),
                     ),
                     onPressed: () =>
-                     Navigator.push(context, MaterialPageRoute(builder: (context) => TaskForm())),
+                     Navigator.push(context, MaterialPageRoute(builder: (context) => const TaskForm())),
                     child: const Icon(Icons.add)),
                 ),
           
                 for (var task in state.tasks)
                   Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: Container(
-                      padding: EdgeInsets.all(16.0),
-                      decoration: const BoxDecoration(
+                      padding: const EdgeInsets.all(16.0),
+                      decoration: BoxDecoration(
                         color: Colors.white,
-                        border: Border(
-                          right: BorderSide(
-                            color: Colors.grey,
-                            width: 1.0,
-                          ),
-                          left: BorderSide(
-                            color: Colors.grey,
-                            width: 1.0,
-                          ),
-                          top: BorderSide(
-                            color: Colors.grey,
-                            width: 1.0,
-                          ),
-                          bottom: BorderSide(
-                            color: Colors.grey,
-                            width: 1.0,
-                          ),
-                        ),
+                        border: Border.all(
+                          color: task.isCompleted ? completedColor : pendingColor,
+                          width: 1.0,
+                        )
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,7 +64,7 @@ class Home extends StatelessWidget {
                           ),
                           const SizedBox(height: 8.0),
                           Text(
-                            task.dueDate.toString(),
+                            task.dueDate,
                             style: TextStyle(
                               color: Colors.grey[600],
                             ),
@@ -96,11 +85,31 @@ class Home extends StatelessWidget {
                           ),
                           const SizedBox(height: 8.0),
                           Text(
-                            task.isCompleted ? 'Completed' : 'Pending',
+                            task.isCompleted ? 'Completado' : 'Pendiente',
                             style: TextStyle(
                               color: Colors.grey[600],
                             ),
                           ),
+                          const SizedBox(height: 8.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              IconButton(
+                                onPressed: () => context.read<TasksCubit>().toogleTask(task),
+                                icon: Icon(
+                                  task.isCompleted ? Icons.check_box : Icons.check_box_outline_blank,
+                                  color: task.isCompleted ? completedColor : pendingColor,
+                                ),
+                              ),
+                              IconButton(
+                                onPressed: () => context.read<TasksCubit>().removeTask(task),
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Color.fromARGB(209, 244, 67, 54),
+                                ),
+                              ),
+                            ],
+                          )                          
                         ],
                       )
                     ),

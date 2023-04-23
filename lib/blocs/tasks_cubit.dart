@@ -13,4 +13,10 @@ class TasksCubit extends Cubit<TaskState> {
     emit(state.copyWith(tasks: state.tasks..remove(task)));
   }
 
+  void toogleTask(Task task) {
+    int toogledTaskIndex = state.tasks.indexOf(task);
+    state.tasks[toogledTaskIndex] = task.copyWith(isCompleted: !task.isCompleted);
+    emit(state.copyWith(tasks: state.tasks));
+  }
+
 }

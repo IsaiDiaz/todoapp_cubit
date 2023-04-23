@@ -3,10 +3,9 @@ import 'package:todoapp_cubit/states/tag_state.dart';
 import 'package:todoapp_cubit/dto/tag.dart';
 
 List<Tag> defaultTags = [
-    Tag(text: 'All'),
-    Tag(text: 'Work'),
-    Tag(text: 'Home'),
-    Tag(text: 'Personal'),
+    const Tag(text: 'Trabajo'),
+    const Tag(text: 'Hogar'),
+    const Tag(text: 'Personal'),
   ];
 
 class TagsCubit extends Cubit<TagState> {
@@ -34,7 +33,7 @@ class TagsCubit extends Cubit<TagState> {
 
   void updateTemporalTag(Tag tag, String text){
     int updatedTagindex = state.temporalTags.indexOf(tag);
-    state.temporalTags[updatedTagindex].text = text;
+    state.temporalTags[updatedTagindex] = tag.copyWith(text: text);
     emit(state.copyWith(temporalTags: state.temporalTags));
   }
 

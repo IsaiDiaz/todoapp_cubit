@@ -7,27 +7,29 @@ import 'package:todoapp_cubit/blocs/tags_cubit.dart';
 import 'package:todoapp_cubit/dto/task.dart';
 import 'package:todoapp_cubit/dto/tag.dart';
 
-class TaskForm extends StatelessWidget {
+class TaskForm extends StatefulWidget {
   const TaskForm({Key? key}) : super(key: key);
 
   @override
+  TaskFormState createState() => TaskFormState();
+}
+
+class TaskFormState extends State<TaskForm> {
+  final formKey = GlobalKey<FormState>();
+  DateTime dueDate = DateTime.now();
+  String taskName = '';
+
+  @override
   Widget build(BuildContext context) {
-    final formKey = GlobalKey<FormState>();
-    final tagsController = TextEditingController();
-
-    String taskName = '';
-    DateTime dueDate = DateTime.now();
-
     void submitForm() {
       if (formKey.currentState!.validate()) {
-        // Form is valid, do something with the data
         formKey.currentState!.save();
         int selectTag = BlocProvider.of<TagsCubit>(context).state.selectedTag;
         final task = Task(
           title: taskName,
           description: "Descripcion",
           isCompleted: false,
-          dueDate: dueDate,
+          dueDate: '${dueDate.day}/${dueDate.month}/${dueDate.year}',
           tag: BlocProvider.of<TagsCubit>(context).state.tags[selectTag],
         );
         BlocProvider.of<TasksCubit>(context).addTask(task);
@@ -37,7 +39,7 @@ class TaskForm extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('New Task'),
+        title: const Text('Nueva Tarea'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -48,32 +50,37 @@ class TaskForm extends StatelessWidget {
             children: <Widget>[
               TextFormField(
                 decoration: const InputDecoration(
-                  labelText: 'Task Name',
+                  labelText: 'Nombre de tarea',
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Please enter a task name';
+                    return 'Porfavor ingresar un nombre de tarea';
                   }
                   return null;
                 },
                 onSaved: (value) {
-                  taskName = value!;
+                  setState(() {
+                    taskName = value!;
+                  });
                 },
               ),
               const SizedBox(height: 16.0),
               Row(
                 children: <Widget>[
-                  const Text('Due Date: '),
+                  const Text('Fecha de vencimiento: '),
                   TextButton(
                     onPressed: () async {
                       final date = await showDatePicker(
                         context: context,
                         initialDate: dueDate,
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime.now().add(const Duration(days: 365)),
+                        firstDate: DateTime.now().subtract(const Duration(days: 3650)),
+                        lastDate: DateTime.now().add(const Duration(days: 3650)),
+                        locale: const Locale('es', ''),
                       );
                       if (date != null) {
-                        dueDate = date;
+                        setState(() {
+                          dueDate = date;
+                        });
                       }
                     },
                     child: Text(
@@ -90,7 +97,7 @@ class TaskForm extends StatelessWidget {
                       builder: (context, state) {
                         return DropdownButtonFormField(
                           value: state.tags.isEmpty ? null : state.tags[state.selectedTag],
-                          hint: const Text('Select a tag'),
+                          hint: const Text('Selecciona una etiqueta'),
                           items: state.tags.map((tag) {
                             return DropdownMenuItem(
                               value: tag,
@@ -106,10 +113,12 @@ class TaskForm extends StatelessWidget {
                   ),
                   const SizedBox(width: 16.0),
                   IconButton(
+                    tooltip: 'Agregar o editar etiquetas',
+                    color: Colors.blue,
                     onPressed: () => Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => AddTag())),
+                            builder: (context) => const AddTag())),
                     icon: const Icon(Icons.edit),
                   ),
                 ],
@@ -123,12 +132,12 @@ class TaskForm extends StatelessWidget {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text('Cancel'),
+                    child: const Text('Cancelar'),
                   ),
                   const SizedBox(width: 16.0),
                   ElevatedButton(
                     onPressed: submitForm,
-                    child: Text('Add Task'),
+                    child: const Text('Agregar Tarea'),
                   ),
                 ],
               ),

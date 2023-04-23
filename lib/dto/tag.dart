@@ -1,8 +1,10 @@
 import 'package:equatable/equatable.dart';
 
 class Tag extends Equatable{
-  String text;
-  Tag({required this.text});
+  final String text;
+  const Tag({required this.text});
+
+  Tag copyWith({String? text}) => Tag(text: text ?? this.text);
 
   @override
   List<Object?> get props => [text];

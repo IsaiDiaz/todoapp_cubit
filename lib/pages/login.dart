@@ -13,10 +13,10 @@ class Login extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Login"),
+        title: const Text("Inicio de sesion"),
       ),
       body: Padding(
-        padding: EdgeInsets.all(45.0),
+        padding: const EdgeInsets.all(45.0),
         child: Form(
           key: _formKey,
           child: Column(
@@ -24,41 +24,38 @@ class Login extends StatelessWidget {
             children: <Widget>[
               TextFormField(
                 controller: _usernameController,
-                decoration: InputDecoration(
-                  labelText: 'Username',
+                decoration: const InputDecoration(
+                  labelText: 'Nombre de usuario',
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Please enter your username';
+                    return 'Porfavor ingrese su nombre de usuario';
                   }
                   return null;
                 },
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               TextFormField(
                 controller: _passwordController,
                 obscureText: true,
-                decoration: InputDecoration(
-                  labelText: 'Password',
+                decoration: const InputDecoration(
+                  labelText: 'Contraseña',
                 ),
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Please enter your password';
+                    return 'Porfavor ingrese su contraseña';
                   }
                   return null;
                 },
               ),
-              SizedBox(height: 32.0),
+              const SizedBox(height: 32.0),
               ElevatedButton(
                 onPressed:(){
                   if (_formKey.currentState!.validate()) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Processing Data')),
-                    );
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const Home()));
                   }
                 },
-                child: Text('Login'),
+                child: const Text('Ingresar'),
               ),
             ],
           ),
