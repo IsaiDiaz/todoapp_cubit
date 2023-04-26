@@ -2,14 +2,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todoapp_cubit/states/tag_state.dart';
 import 'package:todoapp_cubit/dto/tag.dart';
 
-List<Tag> defaultTags = [
+List<Tag> initialTags = [
     const Tag(text: 'Trabajo'),
     const Tag(text: 'Hogar'),
     const Tag(text: 'Personal'),
   ];
 
 class TagsCubit extends Cubit<TagState> {
-  TagsCubit() : super(TagState(tags: defaultTags, temporalTags: defaultTags));
+  TagsCubit() : super(TagState(tags: initialTags, temporalTags: initialTags));
 
   void addTag(Tag tag) {
     emit(state.copyWith(tags: [...state.tags, tag], temporalTags: [...state.tags, tag]));
