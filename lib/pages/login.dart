@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:todoapp_cubit/states/login_state.dart';
 import 'home.dart';
+import 'package:todoapp_cubit/blocs/login_cubit.dart';
 
 class Login extends StatelessWidget {
   Login({super.key});
@@ -19,45 +22,60 @@ class Login extends StatelessWidget {
         padding: const EdgeInsets.all(45.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              TextFormField(
-                controller: _usernameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nombre de usuario',
+          child: BlocBuilder<LoginCubit, LoginState>(
+            builder: (context, state) => 
+            BlocProvider.of<LoginCubit>(context).state.isLoading ? const CircularProgressIndicator() 
+            : Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                TextFormField(
+                  controller: _usernameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre de usuario',
+                  ),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Porfavor ingrese su nombre de usuario';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Porfavor ingrese su nombre de usuario';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16.0),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Contraseña',
+                const SizedBox(height: 16.0),
+                TextFormField(
+                  controller: _passwordController,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Contraseña',
+                  ),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Porfavor ingrese su contraseña';
+                    }
+                    return null;
+                  },
                 ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Porfavor ingrese su contraseña';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 32.0),
-              ElevatedButton(
-                onPressed:(){
-                  if (_formKey.currentState!.validate()) {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => const Home()));
-                  }
-                },
-                child: const Text('Ingresar'),
-              ),
-            ],
+                const SizedBox(height: 32.0),
+                ElevatedButton(
+                  onPressed:(){
+                    if (_formKey.currentState!.validate()) {
+                      BlocProvider.of<LoginCubit>(context).loading();
+                      BlocProvider.of<LoginCubit>(context).loginWithCredentials(_usernameController.text, _passwordController.text);
+                      bool isLogged = BlocProvider.of<LoginCubit>(context).state.isLogged;
+                      if (isLogged){
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const Home()));
+                      }else{
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Usuario o contraseña incorrectos'),
+                          ),
+                        );
+                      }
+                    }
+                  },
+                  child: const Text('Ingresar'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
