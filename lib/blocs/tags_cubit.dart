@@ -10,8 +10,8 @@ class TagsCubit extends Cubit<TagState> {
   TagsCubit() : super(TagState());
 
   void getTags(String authToken) async {
+    emit(state.copyWith(tags: List.empty(), selectedTag: null, requestStatus: 'loading'));
     final httpResponse = await LabelsApi.getLabels(authToken);
-    emit(state.copyWith(tags: List.empty()));
     if (httpResponse.statusCode == 200) {
       final jsonData = json.decode(httpResponse.body);
       if (jsonData['code'] == '0000') {
@@ -20,73 +20,82 @@ class TagsCubit extends Cubit<TagState> {
           Tag tag = Tag(text: item['name'], id: item['labelId']);
           addTag(tag);
         }
-      }else{
-        emit(state.copyWith(requestStatus: 'error_get_labels'));
+        emit(state.copyWith(requestStatus: 'success'));
+      } else {
+        emit(state.copyWith(requestStatus: 'error ${jsonData['code']}'));
       }
-    }else{
-      emit(state.copyWith(requestStatus: 'error_get_labels'));
+    } else {
+      emit(state.copyWith(requestStatus: 'error ${httpResponse.statusCode}'));
     }
   }
 
   static Future<Tag> getOneTag(String authToken, int id) async {
     final httpResponse = await LabelsApi.getLabel(authToken, id);
-    Tag tag = Tag(text: 'No Text', id: 0);
-    if(httpResponse.statusCode == 200){
+    Tag tag = const Tag(text: 'Error buscando esta etiqueta', id: 0);
+    if (httpResponse.statusCode == 200) {
       final jsonData = json.decode(httpResponse.body);
-      if(jsonData['code']=='0000'){
+      if (jsonData['code'] == '0000') {
         final response = jsonData['response'];
         tag = Tag(text: response['name'], id: response['labelId']);
-        return tag; 
+        return tag;
       }
     }
     return tag;
   }
 
-  void postTag(String name, DateTime date, String authToken)async{
-    emit(state.copyWith(requestStatus: 'loading_post_label'));
+  void postTag(String name, DateTime date, String authToken) async {
+    emit(state.copyWith(requestStatus: 'loading'));
     final httpResponse = await LabelsApi.postLabel(name, date, authToken);
-    if(httpResponse.statusCode == 200){
+    if (httpResponse.statusCode == 200) {
       final jsonData = json.decode(httpResponse.body);
-      if(jsonData['code']=='0000'){
-        emit(state.copyWith(requestStatus: 'success_post_label'));
-      }else{
-        emit(state.copyWith(requestStatus: 'error_post_label'));
+      if (jsonData['code'] == '0000') {
+        emit(state.copyWith(requestStatus: 'success'));
+      } else {
+        emit(state.copyWith(requestStatus: 'error ${jsonData['code']}'));
       }
-    }else{
-      emit(state.copyWith(requestStatus: 'error_post_label'));
+    } else {
+      emit(state.copyWith(requestStatus: 'error ${httpResponse.statusCode}'));
     }
   }
 
-  void updateTag(String text, DateTime date, String authToken, int id) async{
-    final httpResponse =  await LabelsApi.updateLabel(text, date, authToken, id); 
-    if(httpResponse.statusCode == 200){
+  void updateTag(String text, DateTime date, String authToken, int id) async {
+    emit(state.copyWith(requestStatus: 'loading'));
+    final httpResponse = await LabelsApi.updateLabel(text, date, authToken, id);
+    if (httpResponse.statusCode == 200) {
       final jsonData = json.decode(httpResponse.body);
-      if(jsonData['code']=='0000'){
-        emit(state.copyWith(requestStatus: 'success_update_label'));
-      }else{
-        emit(state.copyWith(requestStatus: 'error_update_label'));
+      if (jsonData['code'] == '0000') {
+        emit(state.copyWith(requestStatus: 'success'));
+      } else {
+        emit(state.copyWith(requestStatus: 'error ${jsonData['code']}'));
       }
+    }else{
+      emit(state.copyWith(requestStatus: 'error ${httpResponse.statusCode}'));
     }
   }
 
   void deleteTag(String authToken, int id) async {
+    emit(state.copyWith(requestStatus: 'loading'));
     final httpResponse = await LabelsApi.deleteLabel(id, authToken);
-    if(httpResponse.statusCode == 200){
+    if (httpResponse.statusCode == 200) {
       final jsonData = json.decode(httpResponse.body);
-      if(jsonData['code']=='0000'){
-        emit(state.copyWith(requestStatus: 'success_delete_label'));
-      }else{
-        emit(state.copyWith(requestStatus: 'error_delete_label'));
+      if (jsonData['code'] == '0000') {
+        emit(state.copyWith(requestStatus: 'success'));
+      } else {
+        emit(state.copyWith(requestStatus: 'error ${jsonData['code']}'));
       }
+    }else{
+      emit(state.copyWith(requestStatus: 'error ${httpResponse.statusCode}'));
     }
   }
 
   void addTag(Tag tag) {
-    emit(state.copyWith(tags: [...state.tags, tag], temporalTags: [...state.tags, tag]));
+    emit(state.copyWith(
+        tags: [...state.tags, tag], temporalTags: [...state.tags, tag]));
   }
 
   void removeTag(Tag tag) {
-    emit(state.copyWith(tags: state.tags..remove(tag), temporalTags: state.tags..remove(tag)));
+    emit(state.copyWith(
+        tags: state.tags..remove(tag), temporalTags: state.tags..remove(tag)));
   }
 
   void selectTag(int index) {
@@ -97,20 +106,27 @@ class TagsCubit extends Cubit<TagState> {
     emit(state.copyWith(temporalTags: [...state.temporalTags, tag]));
   }
 
-  void removeTemporalTag(Tag tag){
+  void removeTemporalTag(Tag tag) {
     emit(state.copyWith(temporalTags: state.temporalTags..remove(tag)));
   }
 
-  void updateTemporalTag(Tag tag, String text){
+  void updateTemporalTag(Tag tag, String text) {
     int updatedTagindex = state.temporalTags.indexOf(tag);
     state.temporalTags[updatedTagindex] = tag.copyWith(text: text);
     emit(state.copyWith(temporalTags: state.temporalTags));
   }
 
-  void saveTags(String authToken){
-    List<Tag> newTags = state.temporalTags.where((element) => !state.tags.contains(element)).toList();
-    List<Tag> editedTags = state.temporalTags.where((element) => state.tags.contains(element)).toList();
-    List<Tag> deletedTags = state.tags.where((element) => !state.temporalTags.contains(element)).toList();
+  void saveTags(String authToken) {
+    emit(state.copyWith(requestStatus: 'loading'));
+    List<Tag> newTags = state.temporalTags
+        .where((element) => !state.tags.contains(element))
+        .toList();
+    List<Tag> editedTags = state.temporalTags
+        .where((element) => state.tags.contains(element))
+        .toList();
+    List<Tag> deletedTags = state.tags
+        .where((element) => !state.temporalTags.contains(element))
+        .toList();
     //Eliminar etiquetas eliminadas del servidor
     for (var tag in deletedTags) {
       deleteTag(authToken, tag.id);
@@ -128,8 +144,7 @@ class TagsCubit extends Cubit<TagState> {
     getTags(authToken);
   }
 
-  void cancelTemporalTags(){
+  void cancelTemporalTags() {
     emit(state.copyWith(temporalTags: state.tags));
   }
-
 }

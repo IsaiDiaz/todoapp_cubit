@@ -6,14 +6,17 @@ class TaskState {
   final List<Tag> tags;
   final String requestStatus;
 
-  TaskState({this.tasks = const [], this.tags = const [], this.requestStatus = 'none'});
+  TaskState(
+      {this.tasks = const [],
+      this.tags = const [],
+      this.requestStatus = 'none'});
 
-  TaskState copyWith({List<Task>? tasks, List<Tag>? tags, String? requestStatus}) {
+  TaskState copyWith(
+      {List<Task>? tasks, List<Tag>? tags, String? requestStatus}) {
     return TaskState(
       tasks: tasks ?? this.tasks,
       tags: tags ?? this.tags,
       requestStatus: requestStatus ?? this.requestStatus,
     );
   }
-
 }

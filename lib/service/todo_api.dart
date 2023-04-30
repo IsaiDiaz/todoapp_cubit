@@ -39,12 +39,8 @@ class TodoApi {
         });
   }
 
-  static Future<http.Response> deleteTask(
-    String authToken, int id
-  ) async{
+  static Future<http.Response> deleteTask(String authToken, int id) async {
     return await http.delete(Uri.parse('http://localhost:9999/api/v1/task/$id'),
-    headers: {'Authorization' : 'Bearer $authToken'}
-    );
+        headers: {'Authorization': 'Bearer $authToken'});
   }
-
 }

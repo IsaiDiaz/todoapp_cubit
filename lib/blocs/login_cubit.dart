@@ -11,19 +11,22 @@ class LoginCubit extends Cubit<LoginState> {
     final httpResponse = await AuthApi.login(userName, password);
     bool isLogged = false;
     User user;
-    if(httpResponse.statusCode == 200){
+    if (httpResponse.statusCode == 200) {
       final jsonData = json.decode(httpResponse.body);
-      if(jsonData['code'] == '0000'){
-         final response = jsonData['response'];
-        user = User(authToken: response['authToken'], refreshToken: response['refreshToken'], userName: userName);
+      if (jsonData['code'] == '0000') {
+        final response = jsonData['response'];
+        user = User(
+            authToken: response['authToken'],
+            refreshToken: response['refreshToken'],
+            userName: userName);
         isLogged = true;
         print('authToken: ${user.authToken}');
         emit(state.copyWith(user: user, isLogged: isLogged, isLoading: false));
-      }else{
+      } else {
         user = const User();
         emit(state.copyWith(user: user, isLogged: isLogged, isLoading: false));
       }
-    }else{
+    } else {
       user = const User();
       emit(state.copyWith(user: user, isLogged: isLogged, isLoading: false));
     }

@@ -5,7 +5,10 @@ class LoginState {
   final bool isLogged;
   final bool isLoading;
 
-  LoginState({this.user = const User(), this.isLogged = false, this.isLoading = false});
+  LoginState(
+      {this.user = const User(),
+      this.isLogged = false,
+      this.isLoading = false});
 
   LoginState copyWith({User? user, bool? isLogged, bool? isLoading}) {
     return LoginState(

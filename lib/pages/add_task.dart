@@ -109,22 +109,32 @@ class TaskFormState extends State<TaskForm> {
                   Expanded(
                     child: BlocBuilder<TagsCubit, TagState>(
                       builder: (context, state) {
-                        return DropdownButtonFormField(
-                          value: state.tags.isEmpty
-                              ? 'No existen etiquetas'
-                              : state.tags[state.selectedTag],
-                          hint: const Text('Selecciona una etiqueta'),
-                          items: state.tags.map((tag) {
-                            return DropdownMenuItem(
-                              value: tag,
-                              child: Text(tag.text),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            BlocProvider.of<TagsCubit>(context)
-                                .selectTag(state.tags.indexOf(value as Tag));
-                          },
-                        );
+                        String status = BlocProvider.of<TagsCubit>(context)
+                            .state
+                            .requestStatus;
+                        return status == 'loading'
+                            ? const Center(child: CircularProgressIndicator())
+                            : status.contains('error')
+                                ? Center(
+                                    child: Text('$status'),
+                                  )
+                                : DropdownButtonFormField(
+                                    value: state.tags.isEmpty
+                                        ? 'No existen etiquetas'
+                                        : state.tags[state.selectedTag],
+                                    hint: const Text('Selecciona una etiqueta'),
+                                    items: state.tags.map((tag) {
+                                      return DropdownMenuItem(
+                                        value: tag,
+                                        child: Text(tag.text),
+                                      );
+                                    }).toList(),
+                                    onChanged: (value) {
+                                      BlocProvider.of<TagsCubit>(context)
+                                          .selectTag(
+                                              state.tags.indexOf(value as Tag));
+                                    },
+                                  );
                       },
                     ),
                   ),

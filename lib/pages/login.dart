@@ -14,10 +14,9 @@ class Login extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-  BlocProvider.of<LoginCubit>(context).logout();
-  _usernameController.text = '';
-  _passwordController.text = '';
+    BlocProvider.of<LoginCubit>(context).logout();
+    _usernameController.text = '';
+    _passwordController.text = '';
 
     return Scaffold(
       appBar: AppBar(
@@ -28,58 +27,68 @@ class Login extends StatelessWidget {
         child: Form(
           key: _formKey,
           child: BlocBuilder<LoginCubit, LoginState>(
-            builder: (context, state) => 
-            BlocProvider.of<LoginCubit>(context).state.isLoading ? const CircularProgressIndicator() 
-            : Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                TextFormField(
-                  controller: _usernameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Nombre de usuario',
+            builder: (context, state) => BlocProvider.of<LoginCubit>(context)
+                    .state
+                    .isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      TextFormField(
+                        controller: _usernameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Nombre de usuario',
+                        ),
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Porfavor ingrese su nombre de usuario';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16.0),
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Contraseña',
+                        ),
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Porfavor ingrese su contraseña';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 32.0),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            BlocProvider.of<LoginCubit>(context).loading();
+                            await BlocProvider.of<LoginCubit>(context)
+                                .loginWithCredentials(_usernameController.text,
+                                    _passwordController.text);
+                            if (BlocProvider.of<LoginCubit>(context)
+                                .state
+                                .isLogged) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const Home()));
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content:
+                                      Text('Usuario o contraseña incorrectos'),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        child: const Text('Ingresar'),
+                      ),
+                    ],
                   ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Porfavor ingrese su nombre de usuario';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16.0),
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Contraseña',
-                  ),
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'Porfavor ingrese su contraseña';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 32.0),
-                ElevatedButton(
-                  onPressed:() async {
-                    if (_formKey.currentState!.validate()) {
-                      BlocProvider.of<LoginCubit>(context).loading();
-                      await BlocProvider.of<LoginCubit>(context).loginWithCredentials(_usernameController.text, _passwordController.text);
-                      if (BlocProvider.of<LoginCubit>(context).state.isLogged){
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => const Home()));
-                      }else{
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Usuario o contraseña incorrectos'),
-                          ),
-                        );
-                      }
-                    }
-                  },
-                  child: const Text('Ingresar'),
-                ),
-              ],
-            ),
           ),
         ),
       ),

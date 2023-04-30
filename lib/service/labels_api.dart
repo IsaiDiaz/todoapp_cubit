@@ -37,8 +37,8 @@ class LabelsApi {
   }
 
   static Future<http.Response> deleteLabel(int id, String authToken) async {
-    return await http.delete(Uri.parse('http://localhost:9999/api/v1/label/$id'),
-      headers: {'Authorization': 'Bearer $authToken'}
-    );
+    return await http.delete(
+        Uri.parse('http://localhost:9999/api/v1/label/$id'),
+        headers: {'Authorization': 'Bearer $authToken'});
   }
 }

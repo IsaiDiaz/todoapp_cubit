@@ -1,7 +1,7 @@
 import 'tag.dart';
 import 'package:equatable/equatable.dart';
 
-class Task extends Equatable{
+class Task extends Equatable {
   final int id;
   final String title;
   final String description;
@@ -37,5 +37,6 @@ class Task extends Equatable{
   }
 
   @override
-  List<Object?> get props => [id, title, description, dueDate, isCompleted, tags];
+  List<Object?> get props =>
+      [id, title, description, dueDate, isCompleted, tags];
 }
