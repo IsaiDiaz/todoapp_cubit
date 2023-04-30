@@ -1,15 +1,48 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todoapp_cubit/states/tag_state.dart';
 import 'package:todoapp_cubit/dto/tag.dart';
-
-List<Tag> initialTags = [
-    const Tag(text: 'Trabajo'),
-    const Tag(text: 'Hogar'),
-    const Tag(text: 'Personal'),
-  ];
+import 'package:todoapp_cubit/service/labels_api.dart';
+import 'dart:convert';
 
 class TagsCubit extends Cubit<TagState> {
-  TagsCubit() : super(TagState(tags: initialTags, temporalTags: initialTags));
+  TagsCubit() : super(TagState());
+
+  void getTagsFromServer(String authToken) async {
+    final httpResponse = await LabelsApi.getLabels(authToken);
+    if (httpResponse.statusCode == 200) {
+      final jsonData = json.decode(httpResponse.body);
+      if (jsonData['code'] == '0000') {
+        final response = jsonData['response'];
+        for (var item in response) {
+          Tag tag = Tag(text: item['name'], id: item['labelId']);
+          addTag(tag);
+        }
+      }else{
+        emit(state.copyWith(requestStatus: 'error'));
+      }
+    }else{
+      emit(state.copyWith(requestStatus: 'error'));
+    }
+  }
+
+  void getOneTag(String authToken, int id) async {
+    final httpResponse = await LabelsApi.getLabel(authToken, id);
+    if(httpResponse.statusCode == 200){
+      final jsonData = json.decode(httpResponse.body);
+      if(jsonData['code']=='0000'){
+        final response = jsonData['response'];
+        Tag tag = Tag(text: response['name'], id: response['labelId']);
+      }else{
+        emit(state.copyWith(requestStatus: 'error'));
+      }
+    }else{
+      emit(state.copyWith(requestStatus: 'error'));
+    }
+  }
+
+  void postTag(String authToken, Tag newTag)async{
+    
+  }
 
   void addTag(Tag tag) {
     emit(state.copyWith(tags: [...state.tags, tag], temporalTags: [...state.tags, tag]));

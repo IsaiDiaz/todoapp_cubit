@@ -2,7 +2,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todoapp_cubit/states/login_state.dart';
 import 'package:todoapp_cubit/dto/user.dart';
 import 'package:todoapp_cubit/service/auth_api.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class LoginCubit extends Cubit<LoginState> {
@@ -25,10 +24,6 @@ class LoginCubit extends Cubit<LoginState> {
       user = const User();
     }
     emit(state.copyWith(user: user, isLogged: isLogged, isLoading: false));
-  }
-
-  void login(User user) {
-    emit(state.copyWith(user: user, isLogged: true));
   }
 
   void loading() {

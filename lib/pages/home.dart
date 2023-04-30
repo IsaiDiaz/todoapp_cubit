@@ -3,6 +3,9 @@ import 'add_task.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todoapp_cubit/blocs/tasks_cubit.dart';
 import 'package:todoapp_cubit/states/task_state.dart';
+import 'package:todoapp_cubit/states/login_state.dart';
+import 'package:todoapp_cubit/blocs/login_cubit.dart';
+import 'package:todoapp_cubit/blocs/tags_cubit.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
@@ -12,6 +15,8 @@ class Home extends StatelessWidget {
     Color completedColor = Colors.green;
     Color pendingColor = Colors.red;
 
+    final String authToken = BlocProvider.of<LoginCubit>(context).state.user.authToken!;
+    BlocProvider.of<TagsCubit>(context).getTagsFromServer(authToken);
     return BlocBuilder<TasksCubit, TaskState>(
       builder: (context, state) {
         return Scaffold(

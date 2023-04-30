@@ -87,7 +87,8 @@ class AddTag extends StatelessWidget {
                 IconButton(
                   tooltip: 'Agregar Etiqueta',
                   onPressed: () {
-                    BlocProvider.of<TagsCubit>(context).addTemporalTag(const Tag(text: ''));
+                    int lastId = BlocProvider.of<TagsCubit>(context).state.tags.last.id;
+                    BlocProvider.of<TagsCubit>(context).addTemporalTag(Tag(text: '', id: lastId + 1));
                   },
                   icon: const Icon(Icons.add),
                 ),

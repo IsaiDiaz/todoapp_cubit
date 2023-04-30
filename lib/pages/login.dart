@@ -14,6 +14,11 @@ class Login extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+  BlocProvider.of<LoginCubit>(context).logout();
+  _usernameController.text = '';
+  _passwordController.text = '';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Inicio de sesion"),
