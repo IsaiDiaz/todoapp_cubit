@@ -3,12 +3,16 @@ import 'package:todoapp_cubit/dto/tag.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:todoapp_cubit/blocs/tags_cubit.dart';
 import 'package:todoapp_cubit/states/tag_state.dart';
+import 'package:todoapp_cubit/blocs/login_cubit.dart';
 
 class AddTag extends StatelessWidget {
   const AddTag({super.key});
 
   @override
   Widget build(BuildContext context) {
+
+    String? authToken = BlocProvider.of<LoginCubit>(context).state.user.authToken;
+
     return BlocBuilder<TagsCubit, TagState>(
       builder: (context, state) {
         return Scaffold(
@@ -80,7 +84,7 @@ class AddTag extends StatelessWidget {
                   icon: const Icon(Icons.save),
                   onPressed: () {
                     // Acción para guardar
-                    BlocProvider.of<TagsCubit>(context).saveTags();
+                    BlocProvider.of<TagsCubit>(context).saveTags(authToken!);
                     Navigator.pop(context);
                   },
                 ),

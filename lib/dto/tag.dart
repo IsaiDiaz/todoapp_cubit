@@ -8,5 +8,5 @@ class Tag extends Equatable{
   Tag copyWith({String? text, int? id}) => Tag(text: text ?? this.text, id: id ?? this.id);
 
   @override
-  List<Object?> get props => [text, id];
+  List<Object?> get props => [id];
 }

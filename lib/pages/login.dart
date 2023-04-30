@@ -61,12 +61,11 @@ class Login extends StatelessWidget {
                 ),
                 const SizedBox(height: 32.0),
                 ElevatedButton(
-                  onPressed:(){
+                  onPressed:() async {
                     if (_formKey.currentState!.validate()) {
                       BlocProvider.of<LoginCubit>(context).loading();
-                      BlocProvider.of<LoginCubit>(context).loginWithCredentials(_usernameController.text, _passwordController.text);
-                      bool isLogged = BlocProvider.of<LoginCubit>(context).state.isLogged;
-                      if (isLogged){
+                      await BlocProvider.of<LoginCubit>(context).loginWithCredentials(_usernameController.text, _passwordController.text);
+                      if (BlocProvider.of<LoginCubit>(context).state.isLogged){
                         Navigator.push(context, MaterialPageRoute(builder: (context) => const Home()));
                       }else{
                         ScaffoldMessenger.of(context).showSnackBar(

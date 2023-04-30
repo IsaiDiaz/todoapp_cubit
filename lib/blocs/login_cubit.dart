@@ -17,13 +17,16 @@ class LoginCubit extends Cubit<LoginState> {
          final response = jsonData['response'];
         user = User(authToken: response['authToken'], refreshToken: response['refreshToken'], userName: userName);
         isLogged = true;
+        print('authToken: ${user.authToken}');
+        emit(state.copyWith(user: user, isLogged: isLogged, isLoading: false));
       }else{
         user = const User();
+        emit(state.copyWith(user: user, isLogged: isLogged, isLoading: false));
       }
     }else{
       user = const User();
+      emit(state.copyWith(user: user, isLogged: isLogged, isLoading: false));
     }
-    emit(state.copyWith(user: user, isLogged: isLogged, isLoading: false));
   }
 
   void loading() {
