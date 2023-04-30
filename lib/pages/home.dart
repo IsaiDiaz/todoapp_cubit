@@ -25,19 +25,36 @@ class Home extends StatelessWidget {
       builder: (context, state) {
         String status =
             BlocProvider.of<TasksCubit>(context).state.requestStatus;
-        return status == 'loading'
-            ? const Center(
-                child: CircularProgressIndicator(),
-              )
-            : status.contains('error')
-                ? Center(
-                    child: Text('$status'),
-                  )
-                : Scaffold(
-                    appBar: AppBar(
-                      title: const Text('Lista de tareas'),
-                    ),
-                    body: Padding(
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Lista de tareas'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.logout),
+                onPressed: () {
+                  BlocProvider.of<LoginCubit>(context).logout();
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, '/login', (route) => false);
+                },
+              ),
+              // Botón para actualizar la lista de tareas
+              IconButton(
+                icon: const Icon(Icons.refresh),
+                onPressed: () {
+                  BlocProvider.of<TasksCubit>(context).getTasks(authToken);
+                },
+              ),
+            ],
+          ),
+          body: status == 'loading'
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : status.contains('error')
+                  ? Center(
+                      child: Text('$status'),
+                    )
+                  : Padding(
                       padding: const EdgeInsets.all(15.0),
                       child: GridView.count(
                         crossAxisCount: 2,
@@ -160,7 +177,7 @@ class Home extends StatelessWidget {
                         ],
                       ),
                     ),
-                  );
+        );
       },
     );
   }

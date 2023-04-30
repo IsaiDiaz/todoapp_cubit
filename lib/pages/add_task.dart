@@ -52,6 +52,15 @@ class TaskFormState extends State<TaskForm> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Nueva Tarea'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              BlocProvider.of<TagsCubit>(context).getTags(
+                  BlocProvider.of<LoginCubit>(context).state.user.authToken!);
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
